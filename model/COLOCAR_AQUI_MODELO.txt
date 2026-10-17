@@ -1,0 +1,8 @@
+IMPORTANTE:
+Coloca aquí el archivo real descargado de Google Colab:
+
+modelo_contaminacion_hco2026.pth
+
+No cambies el nombre.
+
+Ese archivo corresponde al modelo entrenado para INNOBEST Huánuco 2026.

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Resultado · INNOBEST{% endblock %}
+{% block content %}
+<div class="result-head">
+  <span class="tag">RESULTADO DE IA</span>
+  <h2>{{ result.class_display }}</h2>
+  <p>Confianza del modelo: <strong>{{ result.confidence }}%</strong></p>
+</div>
+
+<div class="result-grid">
+  <div class="panel">
+    <h3>📊 Diagnóstico</h3>
+    <div class="big-number">{{ result.total }}%</div>
+    <p>Porcentaje estimado de contaminación visual</p>
+    <div class="metric"><span>💨 Humo</span><b>{{ result.smoke }}%</b></div>
+    <div class="metric"><span>🔥 Fuego</span><b>{{ result.fire }}%</b></div>
+    <div class="metric"><span>🗑️ Residuos</span><b>{{ result.waste }}%</b></div>
+    <div class="metric"><span>⚠️ Nivel</span><b>{{ result.contamination_level }}</b></div>
+    <div class="metric"><span>🚦 Riesgo de clase</span><b>{{ result.risk }}</b></div>
+  </div>
+
+  <div class="panel">
+    <h3>📌 Recomendación</h3>
+    <p class="recommendation">{{ result.recommendation }}</p>
+    <hr>
+    <h3>🎯 Probabilidades</h3>
+    {% for p in result.probabilities %}
+      <div class="prob">
+        <div><span>{{ p.class }}</span><b>{{ p.value }}%</b></div>
+        <div class="bar"><i style="width:{{ p.value }}%"></i></div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% if mongo_ok %}
+<div class="alert success">✅ El resultado fue guardado en MongoDB Atlas.</div>
+{% else %}
+<div class="alert warning">⚠️ El resultado se calculó, pero MongoDB no está conectado.</div>
+{% endif %}
+
+<a class="button secondary" href="{{ url_for('index') }}">← Analizar otra imagen</a>
+<a class="button secondary" href="{{ url_for('history') }}">Ver historial</a>
+{% endblock %}

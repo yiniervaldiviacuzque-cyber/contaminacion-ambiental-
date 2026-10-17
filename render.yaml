@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: innobest-contaminacion-huanuco
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true

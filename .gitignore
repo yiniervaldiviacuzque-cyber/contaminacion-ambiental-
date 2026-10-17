@@ -1,0 +1,32 @@
+﻿.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+*.log
+.pytest_cache/
+.idea/
+.vscode/
+
+# Respaldos locales
+*.respaldo
+app_backup_*.py
+app_respaldo.py
+camara_backup_*.html
+camara_js_backup_*.js
+respaldo_*/
+
+# Entornos y archivos temporales
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Respaldos adicionales
+*.respaldo*
+*.respaldo.html

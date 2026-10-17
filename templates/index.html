@@ -1,0 +1,181 @@
+
+{% extends "base.html" %}
+
+{% block title %}Inicio · INNOBEST Huánuco 2026{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div>
+    <span class="tag">INTELIGENCIA ARTIFICIAL</span>
+    <h2>Detección de contaminación ambiental mediante imágenes</h2>
+    <p>
+      Analiza fotografías con inteligencia artificial e identifica
+      posibles señales de contaminación ambiental en Huánuco.
+    </p>
+  </div>
+</section>
+
+<!-- Estado del sistema -->
+<div class="cards">
+  <div class="card">
+    <b>🧠 Modelo de IA</b>
+    <span>{{ "Disponible" if model_ok else "No disponible" }}</span>
+  </div>
+
+  <div class="card">
+    <b>🍃 Base de datos MongoDB</b>
+    <span>{{ "Conectado" if mongo_ok else "No conectado" }}</span>
+  </div>
+
+  <div class="card">
+    <b>📊 Análisis guardados</b>
+    <span>{{ count }}</span>
+  </div>
+</div>
+
+<!-- Mensajes de Flask -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert {{ 'danger' if category == 'error' else 'warning' if category == 'warning' else '' }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<!-- Estado del modelo -->
+{% if not model_ok %}
+<section class="alert danger">
+  <b>⚠️ El modelo entrenado no está disponible.</b>
+  <p>{{ model_error }}</p>
+</section>
+{% endif %}
+
+<!-- Resultado del análisis actual -->
+{% if result is defined and result %}
+<section class="panel">
+  <h3>✅ Resultado del análisis</h3>
+
+  <div class="result-card">
+    <h4>{{ result.categoria_nombre }}</h4>
+
+    <p>{{ result.descripcion }}</p>
+
+    <p>
+      <strong>Confianza del modelo:</strong>
+      {{ "%.2f"|format(result.confianza) }}%
+    </p>
+
+    <p class="muted">
+      La confianza representa la probabilidad estimada por el modelo
+      para la categoría seleccionada. No constituye una medición
+      directa del nivel real de contaminación.
+    </p>
+  </div>
+</section>
+{% endif %}
+
+<!-- Formulario para analizar imágenes -->
+<section class="panel">
+  <h3>📷 Analizar una imagen</h3>
+
+  <p>
+    Selecciona una fotografía del entorno que deseas analizar.
+    Se aceptan imágenes JPG, JPEG, PNG y WEBP, con un máximo de 10 MB.
+  </p>
+
+  <form
+    action="{{ url_for('predict') }}"
+    method="post"
+    enctype="multipart/form-data"
+  >
+    <label class="upload">
+      <span>📁 Seleccionar imagen</span>
+      <input
+        type="file"
+        name="image"
+        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+        required
+      >
+    </label>
+
+    <button type="submit" {% if not model_ok %}disabled{% endif %}>
+      🔍 Analizar con inteligencia artificial
+    </button>
+  </form>
+</section>
+
+<!-- Categorías reconocidas -->
+<section class="panel">
+  <h3>🧩 Categorías del modelo</h3>
+
+  <div class="classes">
+    <span>🔥 Incendio forestal</span>
+    <span>💨 Humo y contaminación</span>
+    <span>⛏️ Minería ilegal</span>
+    <span>🗑️ Basura y residuos</span>
+    <span>🌊 Río contaminado</span>
+    <span>🌳 Ambiente sano</span>
+  </div>
+</section>
+
+<!-- Historial de predicciones -->
+<section class="panel">
+  <h3>🕘 Últimos análisis</h3>
+
+  {% if recent %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Imagen</th>
+          <th>Resultado</th>
+          <th>Confianza</th>
+          <th>Fecha del análisis</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for r in recent %}
+        <tr>
+          <td>{{ r.get('filename', 'Sin nombre') }}</td>
+
+          <td>
+            {{ r.get(
+              'categoria_nombre',
+              classes.get(r.get('categoria', ''), 'Sin categoría')
+            ) }}
+          </td>
+
+          <td>
+            {% if r.get('confianza') is not none %}
+              {{ "%.2f"|format(r.get('confianza')) }}%
+            {% else %}
+              No disponible
+            {% endif %}
+          </td>
+
+          <td>
+            {% if r.get('fecha') %}
+              {{ r.get('fecha').strftime('%d/%m/%Y %H:%M') }}
+            {% else %}
+              Sin fecha
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+    <p class="muted">
+      Todavía no hay análisis guardados. Selecciona una imagen
+      para realizar el primer análisis.
+    </p>
+  {% endif %}
+</section>
+
+{% endblock %}
